@@ -12,22 +12,21 @@
 # NOTE in the package dir execute package_crates to vendor and archive all
 # NOTE of the cargo crates to provide Source1.
 # NOTE In the package dir execute ./prepare_vendor.sh to vendor and archive
-# NOTE the node modules to provide Source2.
-# NOTE In the package dir execute ./prepare_vendor_aarch64.sh to vendor and archive
-# NOTE the node modules to provide Source2.
+# NOTE the node modules to provide Source2 and Source3 tarballs.
 # NOTE Source40 is automatically generated when running the node prepare_vendor
-# NOTE script, commit the versioned file produced with the the updated spec file.
+# NOTE script, commit the updated coolercontrol-node-vendor-licenses.txt file
+# NOTE alongside the updated spec file.
 
 Name:		coolercontrol
 Summary:	Cooling device control for Linux
 Version:	4.2.1
-Release:	1
+Release:	2
 License:	GPL-3.0-or-later
 Group:		System/Monitoring
 URL:		https://docs.coolercontrol.org
 Source0:	https://gitlab.com/%{name}/%{name}/-/releases/%{version}/downloads/packages/%{name}-%{version}.tar.gz
 Source1:	%{name}-%{version}-vendor.tar.xz
-Source2:	%{name}-%{version}-node-vendor.tar.xz
+Source2:	%{name}-%{version}-node-vendor-x86_64.tar.xz
 Source3:	%{name}-%{version}-node-vendor-aarch64.tar.xz
 Source40:	%{name}-node-vendor-licenses.txt
 

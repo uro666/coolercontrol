@@ -42,35 +42,52 @@ if [ ! -w "$PKG_TARBALL" ]; then
     wget "$PKG_URL"
 fi
 
-mkdir -p $PKG_TMPDIR
-pushd "$PKG_TMPDIR"
-tar xf $PKG_TARBALL
-pwd
-ls
-popd
 
-cd $PKG_PATH
+for arch in x64 arm64; do
+    ARCHSTR=""
+    if [[ "$arch" == "arm64" ]]; then
+        ARCHSTR=aarch64
+    fi
+    if [[ "$arch" == "x64" ]]; then
+        ARCHSTR=x86_64
+    fi
 
-export npm_config_cache="$PWD/.package-cache"
-echo ">>>>>> Install npm modules"
-npm ci --prefer-offline
+    mkdir -p $PKG_TMPDIR
+    pushd "$PKG_TMPDIR"
+    tar xf $PKG_TARBALL
+    pwd
+    ls
+    popd
 
-if [ $? -ne 0 ]; then
-    echo "ERROR: npm install failed"
-    cleanup_and_exit 1
-fi
+    cd $PKG_PATH
 
-echo ">>>>>> Package vendor files"
-rm -f $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor.tar.xz
-XZ_OPT="-9e -T$(nproc)" tar cJf $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor.tar.xz .package-cache
-if [ $? -ne 0 ]; then
-    cleanup_and_exit 1
-fi
+    export npm_config_cache="$PWD/.package-cache"
+    echo ">>>>>> Install npm modules for $arch"
+    if [[ "$arch" == "arm64" ]]; then
+        npm ci --prefer-offline -cpu=arm64
+    fi
+    if [[ "$arch" == "x64" ]]; then
+        npm ci --prefer-offline -cpu=x64
+    fi
+    if [ $? -ne 0 ]; then
+        echo "ERROR: npm install failed"
+        cleanup_and_exit 1
+    fi
 
-npm i license-report
-npx license-report --only=prod --output=table --fields=name --fields=licenseType --fields=installedVersion --fields=link > $PKG_DIR/${PKG_NAME}-node-vendor-licenses.txt
+    echo ">>>>>> Package vendor files for $arch"
+    rm -f $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor-${ARCHSTR}.tar.xz
+    XZ_OPT="-9e -T$(nproc)" tar cJf $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor-${ARCHSTR}.tar.xz .package-cache
+    if [ $? -ne 0 ]; then
+        cleanup_and_exit 1
+    fi
 
-cd -
+    npm i license-report
+    npx license-report --only=prod --output=table --fields=name --fields=licenseType --fields=installedVersion --fields=link > $PKG_DIR/${PKG_NAME}-node-vendor-licenses.txt
 
-rm -rf .package-cache node_modules
+    cd -
+
+    rm -rf .package-cache node_modules
+    cleanup_tmpdir
+done
+
 cleanup_and_exit 0
