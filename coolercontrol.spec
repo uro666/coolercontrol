@@ -11,7 +11,9 @@
 # NOTE After updating the spec file version and saving the spec file,
 # NOTE in the package dir execute package_crates to vendor and archive all
 # NOTE of the cargo crates to provide Source1.
-# NOTE In the package dir execute ./prepare_vendor to vendor and archive
+# NOTE In the package dir execute ./prepare_vendor.sh to vendor and archive
+# NOTE the node modules to provide Source2.
+# NOTE In the package dir execute ./prepare_vendor_aarch64.sh to vendor and archive
 # NOTE the node modules to provide Source2.
 # NOTE Source40 is automatically generated when running the node prepare_vendor
 # NOTE script, commit the versioned file produced with the the updated spec file.
@@ -26,6 +28,7 @@ URL:		https://docs.coolercontrol.org
 Source0:	https://gitlab.com/%{name}/%{name}/-/releases/%{version}/downloads/packages/%{name}-%{version}.tar.gz
 Source1:	%{name}-%{version}-vendor.tar.xz
 Source2:	%{name}-%{version}-node-vendor.tar.xz
+Source3:	%{name}-%{version}-node-vendor-aarch64.tar.xz
 Source40:	%{name}-node-vendor-licenses.txt
 
 # coolercontrol
@@ -83,7 +86,12 @@ This is the system daemon for CoolerControl.
 
 # set up for coolercontrolui build
 pushd %{coolercontrolui}
+# conditional to select arch dependent node sources
+%ifarch aarch64
+tar xf %{S:3}
+%else
 tar xf %{S:2}
+%endif
 popd
 
 # set up for coolercontrold build
