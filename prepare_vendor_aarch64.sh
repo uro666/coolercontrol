@@ -61,7 +61,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo ">>>>>> Package vendor files"
-rm -f $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor.tar.xz
+rm -f $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor-aarch64.tar.xz
 XZ_OPT="-9e -T$(nproc)" tar cJf $PKG_DIR/${PKG_NAME}-${PKG_VERSION}-node-vendor-aarch64.tar.xz .package-cache
 if [ $? -ne 0 ]; then
     cleanup_and_exit 1
